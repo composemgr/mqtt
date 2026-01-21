@@ -1,0 +1,33 @@
+# nginx proxy address - http://172.17.0.1:1883
+
+name: mqtt
+x-logging: &default-logging
+  options:
+    max-size: '5m'
+    max-file: '1'
+  driver: json-file
+
+services:
+  app:
+    image: eclipse-mosquitto:latest
+    container_name: mqtt-app
+    hostname: ${BASE_HOST_NAME:-$HOSTNAME}
+    restart: always
+    pull_policy: always
+    logging: *default-logging
+    environment:
+      TZ: ${TZ:-America/New_York}
+    ports:
+      - '1883:1883/tcp'
+    volumes:
+      - '/etc/localtime:/etc/localtime:ro'
+      - './rootfs/data/mqtt:/mosquitto/data'
+      - './rootfs/config/mqtt:/mosquitto/config'
+      - './rootfs/data/log/mqtt:/mosquitto/log'
+    networks:
+      - mqtt
+
+networks:
+  mqtt:
+    name: mqtt
+    external: false
