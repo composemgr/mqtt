@@ -21,9 +21,9 @@ services:
       - '1883:1883/tcp'
     volumes:
       - '/etc/localtime:/etc/localtime:ro'
-      - './rootfs/data/mqtt:/mosquitto/data'
-      - './rootfs/config/mqtt:/mosquitto/config'
-      - './rootfs/data/log/mqtt:/mosquitto/log'
+      - './volumes/data/mqtt:/mosquitto/data'
+      - './volumes/config/mqtt:/mosquitto/config'
+      - './volumes/data/log/mqtt:/mosquitto/log'
     networks:
       - mqtt
 
