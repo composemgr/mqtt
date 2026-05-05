@@ -45,9 +45,9 @@ See `docker-compose.yaml` for complete list of configurable options.
 
 ## 📂 Volumes
 
-- `./rootfs/data/mqtt` - Data storage
-- `./rootfs/config/mqtt` - Data storage
-- `./rootfs/data/log/mqtt` - Data storage
+- `./volumes/data/mqtt` - Data storage
+- `./volumes/config/mqtt` - Data storage
+- `./volumes/data/log/mqtt` - Data storage
 
 ## 🔍 Logging
 
