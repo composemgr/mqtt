@@ -17,6 +17,8 @@ services:
     logging: *default-logging
     environment:
       TZ: ${TZ:-America/New_York}
+      CONTAINER_NAME: mqtt-app
+      HOSTNAME: ${BASE_HOST_NAME:-$HOSTNAME}
     ports:
       - '1883:1883/tcp'
     volumes:
@@ -26,8 +28,30 @@ services:
       - './volumes/data/log/mqtt:/mosquitto/log'
     networks:
       - mqtt
+      - proxy
+      - cloudflare
+    labels:
+      - 'traefik.enable=true'
+      - 'cloudflare.enable=true'
+      - 'traefik.docker.network=proxy'
+      - 'cloudflare.service=http://mqtt-app:1883'
+      - 'cloudflare.hostname=mqtt.${CLOUDFLARE_ZONE_NAME:-}'
+      - 'traefik.http.routers.mqtt-app.entrypoints=http'
+      - 'traefik.http.routers.mqtt-app-secure.tls=true'
+      - 'traefik.http.routers.mqtt-app.rule=Host($(${BASE_HOST_NAME:-$HOSTNAME}))'
+      - 'traefik.http.middlewares.mqtt-app-https-redirect.redirectscheme.scheme=https'
+      - 'traefik.http.routers.mqtt-app.middlewares=mqtt-app-https-redirect'
+      - 'traefik.http.routers.mqtt-app-secure.entrypoints=https'
+      - 'traefik.http.routers.mqtt-app-secure.rule=Host($(${BASE_HOST_NAME:-$HOSTNAME}))'
+      - 'traefik.http.routers.mqtt-app-secure.tls.certresolver=cloudflare'
+      - 'traefik.http.routers.mqtt-app-secure.service=mqtt-app'
+      - 'traefik.http.services.mqtt-app.loadbalancer.server.port=1883'
 
 networks:
   mqtt:
     name: mqtt
     external: false
+  proxy:
+    external: true
+  cloudflare:
+    external: true
