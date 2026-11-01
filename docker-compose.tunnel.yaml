@@ -1,0 +1,42 @@
+name: mqtt
+x-logging: &default-logging
+  options:
+    max-size: '5m'
+    max-file: '1'
+  driver: json-file
+
+services:
+  app:
+    image: eclipse-mosquitto:latest
+    container_name: mqtt-app
+    domainname: ${BASE_DOMAIN_NAME:-example.com}
+    hostname: ${BASE_HOST_NAME:-$HOSTNAME}
+    restart: always
+    pull_policy: always
+    tty: true
+    stdin_open: true
+    logging: *default-logging
+    environment:
+      TZ: ${TZ:-America/New_York}
+      CONTAINER_NAME: mqtt-app
+      HOSTNAME: ${BASE_HOST_NAME:-$HOSTNAME}
+    volumes:
+      - './volumes/data/mqtt:/mosquitto/data:z'
+      - './volumes/config/mqtt:/mosquitto/config:z'
+      - './volumes/data/log/mqtt:/mosquitto/log:z'
+    extra_hosts:
+      - 'host.docker.internal:host-gateway'
+    labels:
+      - 'cloudflare.enable=true'
+      - 'cloudflare.service=http://mqtt-app:1883'
+      - 'cloudflare.hostname=${BASE_HOST_NAME:-$HOSTNAME}'
+    networks:
+      - mqtt
+      - cloudflare
+
+networks:
+  mqtt:
+    name: mqtt
+    external: false
+  cloudflare:
+    external: true
