@@ -22,6 +22,12 @@ services:
       TZ: ${TZ:-America/New_York}
       CONTAINER_NAME: mqtt-app
       HOSTNAME: ${BASE_HOST_NAME:-$HOSTNAME}
+    healthcheck:
+      test: ['CMD', 'nc', '-z', '127.0.0.1', '1883']
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
     ports:
       - '1883:1883'
     volumes:
